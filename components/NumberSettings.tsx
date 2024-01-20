@@ -87,7 +87,8 @@ function btnClass() {
 
 export function getNumbers(min: number, max: number, total: number): number[] {
   const numSet = new Set<number>()
-  while (numSet.size < total || numSet.size >= max - min) {
+  if (total > max - min + 1) total = max - min + 1
+  while (numSet.size < total) {
     numSet.add(Math.floor(Math.random() * (max - min + 1)) + min)
   }
   return Array.from<number>(numSet)

@@ -6,7 +6,7 @@ import { assertEquals } from "$std/assert/mod.ts"
 import { splitNumber } from "../../components/NumbersSignImg.tsx"
 
 describe("splitNumber function", () => {
-  it("should return a list of numbers", () => {
+  it("should split the number correctly", () => {
     const testData = [0, 10, 12, 19, 1234, 5489, 100, 1000, 110, 1010, 2030, 1020, 6800]
     const expected = [
       [0], [10], [12], [19],
