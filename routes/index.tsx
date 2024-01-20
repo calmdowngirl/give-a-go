@@ -12,15 +12,15 @@ export default function Home() {
         />
         <h1 class="text-4xl font-bold">give auslan a go</h1>
         <p class="my-4">
-          Try updating this message in the
-          <code class="mx-2">./routes/index.tsx</code> file, and refresh.
+          <a target="_blank" href="https://en.wikipedia.org/wiki/Auslan" class="underline decoration-dotted">Auslan</a> (/ˈɒzlæn/) is the sign language used by the majority of the Australian Deaf community.
         </p>
       </div>
     </div>
 
-    <div>
-      <ul>
-        <li>aaa</li>
+    <div class="max-w-screen-md mx-auto mt-8 flex flex-col items-center justify-center">
+      <ul class="text-3xl font-thin">
+        <li><a href="/number" class="underline decoration-[#DAA1F5] italic">give numbers a go</a></li>
+        <li><a href="#" class="underline decoration-[#DAA1F5] italic">give letters a go (todo)</a></li>
       </ul>
     </div>
     </>
