@@ -1,5 +1,6 @@
 import { Signal } from "@preact/signals";
 import { JSX } from "preact/jsx-runtime";
+import { getNumbers, getLettersSettings } from "../helpers/list.helper.ts";
 
 /**
  * todo
@@ -19,7 +20,7 @@ let min: number, max: number, interval = -1, total = -1
 export default function NumberSettings(
   idx: Signal<number>, 
   list: Signal<number[]>, 
-  shouldDisplayImg: Signal<boolean>,
+  shouldDisplayResult: Signal<boolean>,
   intvId: Signal<number | null>,
   secsForImgDisplaying: number) {
   const minMaxInputWidth = 'w-60 xl:w-56 lg:w-44 md:w-42 sm:w-40'
@@ -62,7 +63,7 @@ export default function NumberSettings(
           type="submit" 
           action="javascript:" 
           class={btnClass()} 
-          onClick={(e) => play(e, idx, list, shouldDisplayImg, intvId, secsForImgDisplaying)}>
+          onClick={(e) => play(e, idx, list, shouldDisplayResult, intvId, secsForImgDisplaying, () => getNumbers(min, max, total))}>
             go
         </button>
       </div>
@@ -85,15 +86,6 @@ function btnClass() {
   return `${styles} ${onHoverStyles}`
 }
 
-export function getNumbers(min: number, max: number, total: number): number[] {
-  const numSet = new Set<number>()
-  if (total > max - min + 1) total = max - min + 1
-  while (numSet.size < total) {
-    numSet.add(Math.floor(Math.random() * (max - min + 1)) + min)
-  }
-  return Array.from<number>(numSet)
-}
-
 function pause(intvId: Signal<number | null>): void {
   if (intvId.value && intvId.value !== -1) {
     clearInterval(intvId.value)
@@ -101,25 +93,32 @@ function pause(intvId: Signal<number | null>): void {
   }
 }
 
-export function play(
+export function play<T>(
   e: JSX.TargetedMouseEvent<HTMLButtonElement> | null, 
   idx: Signal<number>, 
-  list: Signal<number[]>, 
-  shouldDisplayImg: Signal<boolean>,
+  list: Signal<T[]>, 
+  shouldDisplayResult: Signal<boolean>,
   intvId: Signal<number | null>,
-  secsForImgDisplaying: number
+  secsForImgDisplaying: number,
+  getListFn: (min?: number, max?: number, total?: number) => T[]
 ) {
   e?.preventDefault();
-  localStorage.setItem('currentSettings', JSON.stringify({min, max, interval, total}))
-  list.value = getNumbers(min, max, total);
-  const len = list.peek().length
+  const isListLetters = typeof list.peek()[0] === 'string'
+  if (isListLetters) {
+    ({ min, max, total, interval } = getLettersSettings())
+  } else {
+    localStorage.setItem('currentSettings', JSON.stringify({min, max, interval, total}))
+  }
   
+  list.value = getListFn(min, max, total);
+  const len = list.peek().length
+
   intvId.value = setInterval(() => {
     if (idx.value < len) {
-      shouldDisplayImg.value = true
+      shouldDisplayResult.value = true
       setTimeout(() => {
         idx.value += 1
-        if (idx.peek() < len) shouldDisplayImg.value = false
+        if (idx.peek() < len) shouldDisplayResult.value = false
       }, secsForImgDisplaying * 1000)
     } else {
       pause(intvId)
@@ -129,7 +128,7 @@ export function play(
   // first interval
   if (idx.peek() === 0) {
     setTimeout(() => {
-      shouldDisplayImg.value = true
+      shouldDisplayResult.value = true
     }, interval * 1000)
   }
 }

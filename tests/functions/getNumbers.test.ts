@@ -3,7 +3,7 @@ import {
   it,
 } from "$std/testing/bdd.ts"
 import { assertEquals } from "$std/assert/mod.ts"
-import { getNumbers } from "../../components/NumberSettings.tsx"
+import { getNumbers } from "../../helpers/list.helper.ts"
 
 describe("getNumbers function", () => {
   it("should give a list of distinct numbers of which values r >= min and <= max", () => {

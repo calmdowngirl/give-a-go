@@ -1,4 +1,4 @@
-export default function NumbersSignImg(n: number) {
+export function NumbersSign(n: number) {
   const list = splitNumber(n)
 
   return (
@@ -8,6 +8,16 @@ export default function NumbersSignImg(n: number) {
           const path = `/numbers/${elem}.jpg`
           return <img src={path} class="w-24" />
         })}
+      </div>
+    </div>
+  )
+}
+
+export function TheLetter(ch: string) {
+  return (
+    <div class="flex flex-row justify-center m-0 p-0">
+      <div class="flex flex-column flex-wrap justify-start ml-3">
+        <h1 class ="text-6xl">{ch.toUpperCase()}</h1>
       </div>
     </div>
   )

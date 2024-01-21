@@ -22,7 +22,7 @@ export default function Home() {
         <div class="max-w-screen-md mx-auto mt-8 flex flex-col items-center justify-center">
           <ul class="text-3xl font-thin">
             <li><a href="/number" class="underline decoration-[#DAA1F5] italic">give numbers a go</a></li>
-            <li><a href="#" class="underline decoration-[#DAA1F5] italic">give letters a go (todo)</a></li>
+            <li><a href="/letter" class="underline decoration-[#DAA1F5] italic">give letters a go</a></li>
           </ul>
         </div>
       </div>
