@@ -1,6 +1,8 @@
-import { Signal, computed, effect, useSignal } from "@preact/signals"
+import { Signal, computed, useSignal } from "@preact/signals"
 import NumberSettings, { play } from "../components/NumberSettings.tsx"
 import PauseControls from "../components/PauseControls.tsx"
+import CurrentNumber from "../components/CurrentNumber.tsx"
+import CurrentLetterSign from "../components/CurrentLetterSign.tsx"
 import { TheLetter, NumbersSign } from "../components/NumbersSignImg.tsx"
 import { JSX } from "preact/jsx-runtime"
 import { getLetters, getNumbers, getLettersSettings } from "../helpers/list.helper.ts"
@@ -59,8 +61,8 @@ function List<T>(getListFn: (min?: number, max?: number, total?: number) => T[],
         : (
           <>
             {isListLetters 
-              ? currentLetterSign(currentElement.value as string)
-              : currentNumber(currentElement.value as number)}
+              ? CurrentLetterSign(currentElement.value as string)
+              : CurrentNumber(currentElement.value as number)}
             {shouldDisplayResult.value && 
               (isListLetters 
                 ? TheLetter(currentElement.value as string) 
@@ -74,26 +76,5 @@ function List<T>(getListFn: (min?: number, max?: number, total?: number) => T[],
           </>
       )}
     </main>
-  )
-}
-
-function currentNumber(n: number) {
-  return (
-    <div class="flex flex-row justify-center w-screen my-4">
-      <h1 class="text-9xl">{n}</h1>
-    </div>
-  )
-}
-
-function currentLetterSign(ch: string) {
-  if (!ch) return 
-  const path = `/letters/${ch}.jpg`
-  return (
-    <div class="flex flex-row justify-center w-screen my-4">
-      <div class="flex flex-col justify-center my-4">
-        <p class="text-3xl mb-4">which letter is this? </p>
-        <img src={path} />
-      </div>
-    </div>
   )
 }

@@ -30,7 +30,7 @@ export default function Home() {
         <div class="max-w-screen-md mx-auto mb-1 flex flex-row items-center justify-center text-sm text-gray-300">
           <a target="_blank" href="https://deafnav.com.au/understand/communication/auslan" class={getFooterLinkClass()}>more on auslan</a>
           <span class="px-2">/</span>
-          <a target="_blank" href="https://github.com/calmdowngirl/give-a-go" class={getFooterLinkClass()}>this app on github</a>
+          <a target="_blank" href="https://github.com/calmdowngirl/give-a-go/blob/main/README.md" class={getFooterLinkClass()}>readme</a>
         </div>
       </footer>
     </div>
