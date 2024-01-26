@@ -11,21 +11,28 @@ import { useEffect } from "preact/hooks";
 /**
  * todo
  * [x] show restart and settings button overlay layer
- * [] listen to space keypress event for pauseing and resuming
+ * [x] listen to space keypress event for pauseing and resuming
  * [] allow user feedbacks
  */
 
+declare global {
+  interface Window {
+    setTimeoutIds: number[]
+  }
+}
+
 export function Numbers() {
-  return List<number>((min?: number, max?: number, total?: number) => getNumbers(min!, max!, total!))
+  return Playlist<number>((min?: number, max?: number, total?: number) => getNumbers(min!, max!, total!))
 }
 
 export function Letters() {
-  return List<string>(getLetters, true)
+  return Playlist<string>(getLetters, true)
 }
 
-function List<T>(getListFn: (min?: number, max?: number, total?: number) => T[], isListLetters?: boolean) {
+function Playlist<T>(getListFn: (min?: number, max?: number, total?: number) => T[], isListLetters?: boolean): JSX.Element {
   const list = useSignal<T[]>([])
   const currentElemIdx = useSignal(0)
+  // pause the list will set the intvId to -1
   const intvId = useSignal<number | null>(null)
   const shouldShowSettings = computed<boolean>(() => !isListLetters && list.value.length === 0)
   const currentElement = computed<T>(() => list.value[currentElemIdx.value] ?? list.value[list.value.length - 1])
@@ -34,8 +41,6 @@ function List<T>(getListFn: (min?: number, max?: number, total?: number) => T[],
   const shouldShowResumeBtn = computed(() => isPaused.value && currentElemIdx.value < list.value.length - 1)
 
   const secsForImgDisplaying = isListLetters ? getLettersSettings().secsForImgDisplaying : 2
-
-  useEffect(() => { if (isListLetters) replayFn() }, [])
 
   const resetFn = (e?: JSX.TargetedMouseEvent<HTMLDivElement>, newList: T[] = []) => {
     list.value = newList
@@ -54,6 +59,25 @@ function List<T>(getListFn: (min?: number, max?: number, total?: number) => T[],
     play(null, currentElemIdx, list, shouldDisplayResult, intvId, secsForImgDisplaying, getListFn)
   }
 
+  const resumeFn = () => {
+    if (currentElemIdx.peek() === list.peek().length - 1) return
+    play(null, currentElemIdx, list, shouldDisplayResult, intvId, secsForImgDisplaying, getListFn)
+  }
+
+  useEffect(() => { 
+    if (isListLetters) replayFn() 
+    addEventListener('keyup', (e) => { 
+      if (e.code !== 'Space') return
+      if (intvId.peek() && intvId.peek()! > 0) {
+        clearInterval(intvId.peek()!)
+        intvId.value = -1
+        window.setTimeoutIds.forEach(id => clearTimeout(id))
+      } else {
+        resumeFn()
+      }
+    })
+  }, [])
+
   return (
     <main>
       {shouldShowSettings.value 
@@ -71,6 +95,7 @@ function List<T>(getListFn: (min?: number, max?: number, total?: number) => T[],
               shouldShowResumeBtn, 
               (e: JSX.TargetedMouseEvent<HTMLDivElement>) => resetFn(e), 
               (e: JSX.TargetedMouseEvent<HTMLDivElement>) => replayFn(e),
+              () => resumeFn(),
               isListLetters,
             )}
           </>

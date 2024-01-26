@@ -1,3 +1,5 @@
+import { splitNumber } from "../helpers/list.helper.ts"
+
 export function NumbersSign(n: number) {
   const list = splitNumber(n)
 
@@ -6,7 +8,8 @@ export function NumbersSign(n: number) {
       <div class="flex flex-column flex-wrap justify-start ml-3">
         {...list.map((elem) => {
           const path = `/numbers/${elem}.jpg`
-          return <img src={path} class="w-24" />
+          const imgAltText = `the auslan sign of number ${elem}`
+          return <img src={path} class="w-24" alt={imgAltText} />
         })}
       </div>
     </div>
@@ -14,30 +17,12 @@ export function NumbersSign(n: number) {
 }
 
 export function TheLetter(ch: string) {
+  const ariaLabel = `what is the auslan sign of the letter ${ch}`
   return (
     <div class="flex flex-row justify-center m-0 p-0">
       <div class="flex flex-column flex-wrap justify-start ml-3">
-        <h1 class ="text-6xl">{ch.toUpperCase()}</h1>
+        <h1 class ="text-6xl" aria-labelledby={ariaLabel}>{ch.toUpperCase()}</h1>
       </div>
     </div>
   )
-}
-
-export function splitNumber(n: number): number[] {
-  if (n <= 19) return [n]
-
-  const digits = n.toString().split('')
-  const numbers: number[] = []
-  for (let i = 0; i < digits.length - 2; ++i) {
-    if (digits[i] != '0') {
-      numbers.push(parseInt(digits[i]), 10 ** (digits.length - 1 - i))
-    }
-  }
-
-  numbers.push(parseInt(digits[digits.length - 2]), parseInt(digits[digits.length - 1]))
-
-  if (n % 100 === 0) return numbers.slice(0, -2)
-  if (numbers.slice(-2).join() === '1,0') return [...numbers.slice(0, -2), 10]
-
-  return numbers
 }
