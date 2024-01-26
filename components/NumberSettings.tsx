@@ -15,7 +15,7 @@ import { getNumbers, getLettersSettings } from "../helpers/list.helper.ts";
  * [] enter keypress == submit
  */
 
-let currentSettings = JSON.parse(localStorage.getItem('currentSettings') ?? '{}')
+let currentSettings = JSON.parse(window.localStorage.getItem('currentSettings') ?? '{}')
 let min = parseInt(currentSettings.min ?? 0), 
     max = parseInt(currentSettings.max ?? 9999), 
     interval = parseInt(currentSettings.interval ?? -1), 
@@ -128,7 +128,7 @@ export function play<T>(
   if (isListLetters) {
     ({ min, max, total, interval } = getLettersSettings())
   } else {
-    localStorage.setItem('currentSettings', JSON.stringify({min, max, interval, total}))
+    window.localStorage.setItem('currentSettings', JSON.stringify({min, max, interval, total}))
   }
   
   if (list.peek().length === 0) {
