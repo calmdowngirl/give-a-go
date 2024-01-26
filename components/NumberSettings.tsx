@@ -1,6 +1,7 @@
 import { Signal } from "@preact/signals";
 import { JSX } from "preact/jsx-runtime";
 import { getNumbers, getLettersSettings } from "../helpers/list.helper.ts";
+import { useEffect } from "preact/hooks";
 
 /**
  * todo
@@ -15,11 +16,8 @@ import { getNumbers, getLettersSettings } from "../helpers/list.helper.ts";
  * [] enter keypress == submit
  */
 
-let currentSettings = JSON.parse(window.localStorage.getItem('currentSettings') ?? '{}')
-let min = parseInt(currentSettings.min ?? 0), 
-    max = parseInt(currentSettings.max ?? 9999), 
-    interval = parseInt(currentSettings.interval ?? -1), 
-    total = parseInt(currentSettings.total ?? -1)
+let currentSettings = {} as any
+let min = 0, max = 9999, interval = -1, total = -1
 
 export default function NumberSettings(
   idx: Signal<number>, 
@@ -28,6 +26,15 @@ export default function NumberSettings(
   intvId: Signal<number | null>,
   secsForImgDisplaying: number,
 ): JSX.Element {
+
+  useEffect(() => {
+    currentSettings = JSON.parse(localStorage.getItem('currentSettings') ?? '{}')
+    min = parseInt(currentSettings.min ?? 0), 
+    max = parseInt(currentSettings.max ?? 9999), 
+    interval = parseInt(currentSettings.interval ?? -1), 
+    total = parseInt(currentSettings.total ?? -1)
+  }, [])
+  
   const minMaxInputWidth = 'w-60 xl:w-56 lg:w-44 md:w-42 sm:w-40'
   return (
     <div class="container mx-auto bg-[#F5F4FB] rounded-3xl border border-[#DAA1F5] min-w-fit h-2/3 w-1/3 my-20 py-16 xl:mx-6 lg:mx-4 md:mx-2 sm:mx-2">
@@ -128,7 +135,7 @@ export function play<T>(
   if (isListLetters) {
     ({ min, max, total, interval } = getLettersSettings())
   } else {
-    window.localStorage.setItem('currentSettings', JSON.stringify({min, max, interval, total}))
+    localStorage.setItem('currentSettings', JSON.stringify({min, max, interval, total}))
   }
   
   if (list.peek().length === 0) {

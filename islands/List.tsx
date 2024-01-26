@@ -54,7 +54,7 @@ function Playlist<T>(getListFn: (min?: number, max?: number, total?: number) => 
 
   const replayFn = (e?: JSX.TargetedMouseEvent<HTMLDivElement>) => {
     const { min, max, total } = 
-      isListLetters ? getLettersSettings() : (JSON.parse(window.localStorage.getItem('currentSettings') ?? '{}'))
+      isListLetters ? getLettersSettings() : (JSON.parse(localStorage.getItem('currentSettings') ?? '{}'))
     resetFn(e, getListFn(min, max, total))
     play(null, currentElemIdx, list, shouldDisplayResult, intvId, secsForImgDisplaying, getListFn)
   }
