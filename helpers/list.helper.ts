@@ -30,13 +30,11 @@ function splitNumber(n: number): number[] {
     }
   }
 
-  if (parseInt(digits[digits.length - 2]) !== 0) {
-    numbers.push(parseInt(digits[digits.length - 2]))
-  }
-  numbers.push(parseInt(digits[digits.length - 1]))
+  numbers.push(parseInt(digits[digits.length - 2]), parseInt(digits[digits.length - 1]))
 
   if (n % 100 === 0) return numbers.slice(0, -2)
-  if (numbers.slice(-2).join() === '1,0') return [...numbers.slice(0, -2), 10]
+  if (n % 100 < 10) return [...numbers.slice(0, -2), numbers[numbers.length -1]]
+  if (n % 100 === 10) return [...numbers.slice(0, -2), 10]
 
   return numbers
 }
