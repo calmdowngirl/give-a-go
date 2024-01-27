@@ -1,23 +1,9 @@
 import { Signal } from "@preact/signals";
 import { JSX } from "preact/jsx-runtime";
 import { getNumbers, getLettersSettings } from "../helpers/list.helper.ts";
-import { useEffect } from "preact/hooks";
+import { useLayoutEffect } from "preact/hooks";
 
-/**
- * todo
- * [x] focus on the first input field on page load
- * [x] load values from localStorage if there r any
- * [x] add min max restricts to input field
- * [x] accessibility
- * [x] split numbers
- * [x] find auslang numbers jpegs
- * [x] display numbers in auslan jpegs before jumping to next number
- * [] inputs error checking and add styles for errors
- * [] enter keypress == submit
- */
-
-let currentSettings = {} as any
-let min = 0, max = 9999, interval = -1, total = -1
+let min = -1, max = -1, interval = -1, total = -1
 
 export default function NumberSettings(
   idx: Signal<number>, 
@@ -25,20 +11,27 @@ export default function NumberSettings(
   shouldDisplayResult: Signal<boolean>,
   intvId: Signal<number | null>,
   secsForImgDisplaying: number,
+  prevSettings: Signal<any>
 ): JSX.Element {
 
-  useEffect(() => {
-    currentSettings = JSON.parse(localStorage.getItem('currentSettings') ?? '{}')
-    min = parseInt(currentSettings.min ?? 0), 
-    max = parseInt(currentSettings.max ?? 9999), 
-    interval = parseInt(currentSettings.interval ?? -1), 
-    total = parseInt(currentSettings.total ?? -1)
-  }, [])
+  useLayoutEffect(() => {
+    const s = prevSettings.peek()
+    if (s.min >= 0) min = parseInt(s.min)
+    if (s.max >= 0) max = parseInt(s.max)
+    if (s.interval >= 1) interval = parseInt(s.interval)
+    if (s.total >= 1) total = parseInt(s.total)
+  }, [prevSettings.value])
   
   const minMaxInputWidth = 'w-60 xl:w-56 lg:w-44 md:w-42 sm:w-40'
+
+  const onSubmit = (e: JSX.TargetedMouseEvent<HTMLButtonElement>) => {
+    if (!min || !max || !total || !interval || min < 0 || max < 0 || interval < 1 || total < 1) return
+    play(e, idx, list, shouldDisplayResult, intvId, secsForImgDisplaying, () => getNumbers(min, max, total))
+  }
+
   return (
     <div class="container mx-auto bg-[#F5F4FB] rounded-3xl border border-[#DAA1F5] min-w-fit h-2/3 w-1/3 my-20 py-16 xl:mx-6 lg:mx-4 md:mx-2 sm:mx-2">
-      <form>
+      <form name="numSettingsForm">
       <h1 class="text-center text-5xl font-sans pb-6 text-[#202020] font-extralight">give numbers</h1>
       <div class="flex flex-row justify-between mb-4">
         <input autofocus required
@@ -46,7 +39,7 @@ export default function NumberSettings(
           aria-label="set the range of the numbers: minimum value"
           type="number" 
           name="min" 
-          value={min}
+          value={min >= 0 ? min : prevSettings.peek().min}
           min="0"
           max="9999"
           class={inputClass({width: minMaxInputWidth, moreStyles: 'rounded-r'})} 
@@ -57,7 +50,7 @@ export default function NumberSettings(
           aria-label="set the range of the numbers: maximum value"
           type="number" 
           name="max" 
-          value={max}
+          value={max >= 0 ? max : prevSettings.peek().max}
           min="0"
           max="9999"
           class={inputClass({width: minMaxInputWidth, moreStyles: 'rounded-l'})} 
@@ -69,7 +62,7 @@ export default function NumberSettings(
         aria-label="set a value: hold how many seconds before it should display the next number?" 
         type="number" name="interval" 
         min="1"
-        value={interval >= 1 ? interval : undefined}
+        value={interval >= 1 ? interval : prevSettings.peek().interval}
         class={inputClass({moreStyles: 'mb-4'})} 
         onInput={evt => interval = parseInt((evt.target as HTMLInputElement).value)}
       />
@@ -78,7 +71,7 @@ export default function NumberSettings(
         aria-label="set a value: how many numbers are there in total?" 
         type="nubmer" 
         min="1"
-        value={total >= 1 ? total : undefined}
+        value={total >= 1 ? total : prevSettings.peek().total}
         name="total" 
         class={inputClass({moreStyles: 'mb-10'})} 
         onInput={evt => total = parseInt((evt.target as HTMLInputElement).value)}
@@ -89,7 +82,7 @@ export default function NumberSettings(
           aria-label="generate numbers"
           action="javascript:" 
           class={btnClass()} 
-          onClick={(e) => play(e, idx, list, shouldDisplayResult, intvId, secsForImgDisplaying, () => getNumbers(min, max, total))}>
+          onClick={(e) => onSubmit(e)}>
             go
         </button>
       </div>
@@ -135,7 +128,7 @@ export function play<T>(
   if (isListLetters) {
     ({ min, max, total, interval } = getLettersSettings())
   } else {
-    localStorage.setItem('currentSettings', JSON.stringify({min, max, interval, total}))
+    localStorage.setItem('numberSettings', JSON.stringify({min, max, interval, total}))
   }
   
   if (list.peek().length === 0) {

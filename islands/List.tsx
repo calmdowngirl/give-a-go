@@ -8,13 +8,6 @@ import { JSX } from "preact/jsx-runtime"
 import { getLetters, getNumbers, getLettersSettings } from "../helpers/list.helper.ts"
 import { useEffect } from "preact/hooks";
 
-/**
- * todo
- * [x] show restart and settings button overlay layer
- * [x] listen to space keypress event for pauseing and resuming
- * [] allow user feedbacks
- */
-
 declare global {
   interface Window {
     setTimeoutIds: number[]
@@ -30,6 +23,7 @@ export function Letters() {
 }
 
 function Playlist<T>(getListFn: (min?: number, max?: number, total?: number) => T[], isListLetters?: boolean): JSX.Element {
+  let prevSettings = useSignal<any>({})
   const list = useSignal<T[]>([])
   const currentElemIdx = useSignal(0)
   // pause the list will set the intvId to -1
@@ -54,7 +48,7 @@ function Playlist<T>(getListFn: (min?: number, max?: number, total?: number) => 
 
   const replayFn = (e?: JSX.TargetedMouseEvent<HTMLDivElement>) => {
     const { min, max, total } = 
-      isListLetters ? getLettersSettings() : (JSON.parse(localStorage.getItem('currentSettings') ?? '{}'))
+      isListLetters ? getLettersSettings() : (JSON.parse(localStorage.getItem('numberSettings') ?? '{}'))
     resetFn(e, getListFn(min, max, total))
     play(null, currentElemIdx, list, shouldDisplayResult, intvId, secsForImgDisplaying, getListFn)
   }
@@ -64,7 +58,7 @@ function Playlist<T>(getListFn: (min?: number, max?: number, total?: number) => 
     play(null, currentElemIdx, list, shouldDisplayResult, intvId, secsForImgDisplaying, getListFn)
   }
 
-  useEffect(() => { 
+  useEffect(() => {
     if (isListLetters) replayFn() 
     addEventListener('keyup', (e) => { 
       if (e.code !== 'Space') return
@@ -76,12 +70,13 @@ function Playlist<T>(getListFn: (min?: number, max?: number, total?: number) => 
         resumeFn()
       }
     })
+    prevSettings.value = JSON.parse(localStorage.getItem('numberSettings') ?? '{}')
   }, [])
 
   return (
     <main>
       {shouldShowSettings.value 
-        ? NumberSettings(currentElemIdx, list as Signal<number[]>, shouldDisplayResult, intvId, secsForImgDisplaying)
+        ? NumberSettings(currentElemIdx, list as Signal<number[]>, shouldDisplayResult, intvId, secsForImgDisplaying, prevSettings)
         : (
           <>
             {isListLetters 
